@@ -1,0 +1,4 @@
+name = "ChebyshevQuantum"
+uuid = "df5cf87c-fc0b-48c5-a054-6e32ac4fb76d"
+authors = ["kfgarrity <kevin.garrity@nist.gov>"]
+version = "0.1.0"
