@@ -2,3 +2,8 @@ name = "ChebyshevQuantum"
 uuid = "df5cf87c-fc0b-48c5-a054-6e32ac4fb76d"
 authors = ["kfgarrity <kevin.garrity@nist.gov>"]
 version = "0.1.0"
+
+[deps]
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+Polynomials = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
