@@ -494,6 +494,12 @@ function myplot(c::cheb; npts = 200)
     
 end
 
+function myplot(f::Function, c::cheb; npts = 200)
+
+    myplot(c,f,npts=npts)
+    
+end
+
 function myplot(c::cheb, f::Function; npts = 200)
 
     x = (c.a:(c.b-c.a)/npts:c.b)
