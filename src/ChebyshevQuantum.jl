@@ -1,4 +1,5 @@
 module ChebyshevQuantum
+using Plots
 
 greet() = print("Hello World!")
 
