@@ -5,15 +5,39 @@ using Plots
 
 function find(f::Function, N=110; a = -1.0, b = 1.0)
 
-    println("discont in f")
+#    println("discont in f")
     discont_f0 = find_edges(f, N, a=a, b = b)
-    println()
-    println()
-    println("discont in f prime ")    
+#    println()
+#    println()
+#    println("discont in f prime ")    
     df = x -> ForwardDiff.derivative(f, x);
     discont_f1 = find_edges(df, N, a=a, b = b)
 
     edges = [discont_f0;discont_f1]
+
+    if size(edges)[1] == 0
+        return zeros(0,2)
+    end
+        
+    
+#    println("EDGES ", edges)
+    
+    inds = sortperm(edges[:,1])
+    edges = edges[inds, :]
+
+#    println("EDGES2 ", edges)
+
+    
+    good = [1]
+    for i = 2:size(edges)[1]
+        if abs(edges[i-1,1] - edges[i,1]) > 1e-3 
+            push!(good,i)
+        end
+    end
+    edges = edges[good,:]
+    
+    
+
     return edges
     
 end
@@ -31,7 +55,7 @@ function find_edges(f::Function, N = 110; a=-1.0, b = 1.0)
         end
     end
 
-#    println("local_max ", local_max)
+#    println("local_max ", local_max, grid[local_max])
 
     true_edge = zeros(0,2)
     
@@ -42,19 +66,20 @@ function find_edges(f::Function, N = 110; a=-1.0, b = 1.0)
         ind =argmax(abs.(df_errX))
         new_max_err = abs.(df_errX[ind])
         old_max_err = abs(df_err[i])
-        if new_max_err >= old_max_err *0.5 #true discont doesn't shrink (much) as we get closer
+
+        if new_max_err >= old_max_err *0.1 || new_max_err > 1e2 #true discont doesn't shrink (much) as we get closer
 
             for j = 1:4
                 gridX, grid2X, fgX, dfgX, df_approxX, df_errX = get_derivs(f,df, 20, a=gridX[ind], b=gridX[ind+1])
                 ind =argmax(abs.(df_errX))
                 new_max_err = abs.(df_errX[ind])
-                println("iter $j ", [gridX[ind], gridX[ind+1]], " " , gridX[ind+1] - gridX[ind], " " , [new_max_err, old_max_err])
+#                println("iter $j ", [gridX[ind], gridX[ind+1]], " " , gridX[ind+1] - gridX[ind], " " , [new_max_err, old_max_err])
                 old_max_err = new_max_err
             end
 
-            if new_max_err >= old_max_err *0.5 && new_max_err > 1e4
+            if new_max_err >= old_max_err *0.1 && new_max_err > 1e3
                 true_edge = vcat(true_edge, [gridX[ind]  gridX[ind+1]])
-                println("TRUE dis ", [gridX[ind], gridX[ind+1]])
+#                println("TRUE dis ", [gridX[ind], gridX[ind+1]])
 #                println()
             end
             
@@ -62,12 +87,12 @@ function find_edges(f::Function, N = 110; a=-1.0, b = 1.0)
 
     end
 
-    println("TRUE EDGE ", true_edge)
+#    println("TRUE EDGE ", true_edge)
     
-    plot(grid2[2:end-1], df_err[2:end-1], label="df err ")
-    plot!(grid2, dfg, label="FD", linewidth=3)
-    plot!(grid2, df_approx, label="df appprox", linewidth=2)
-    plot!(grid, fg, label="f")
+#    plot(grid2[2:end-1], df_err[2:end-1], label="df err ")
+#    plot!(grid2, dfg, label="FD", linewidth=3)
+#    plot!(grid2, df_approx, label="df appprox", linewidth=2)
+#    plot!(grid, fg, label="f")
 
     return true_edge
     

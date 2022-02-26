@@ -43,9 +43,32 @@ Base.:(==)(c1::cheb, c2::cheb) = begin
     end
 end
 
+Base.real(c1::cheb) = begin
+
+    #fixed N calculation
+    if (c1.thr < 0 ) 
+        return make_cheb(  real.(c1.f) , thr=-1.0, a=c1.a, b = c1.b)
+
+    else #choose N
+        return make_cheb( x-> real(c1(x)) , thr=c1.thr, a=c1.a, b = c1.b)
+    end
+end
+
+Base.imag(c1::cheb) = begin
+
+    #fixed N calculation
+    if (c1.thr < 0 ) 
+        return make_cheb(  imag.(c1.f) , thr=-1.0, a=c1.a, b = c1.b)
+
+    else #choose N
+        return make_cheb( x-> imag(c1(x)) , thr=c1.thr, a=c1.a, b = c1.b)
+    end
+end
+
+
 Base.:*(c1::cheb, c2::cheb) = begin
 
-    if c1.a != c2.a || c1.b != c2.b
+    if !isapprox(c1.a , c2.a,atol=1e-7) || !isapprox(c1.b , c2.b,atol=1e-7)
         println("ERROR, cheb ranges not the same")
         return c1
     end
@@ -62,7 +85,7 @@ end
 
 Base.:+(c1::cheb, c2::cheb) = begin
 
-    if c1.a != c2.a || c1.b != c2.b
+    if !isapprox(c1.a , c2.a,atol=1e-7) || !isapprox(c1.b , c2.b,atol=1e-7)
         println("ERROR, cheb ranges not the same")
         return c1
     end
@@ -72,36 +95,36 @@ Base.:+(c1::cheb, c2::cheb) = begin
         return make_cheb( c1.f +c2.f , thr=-1.0, a=c1.a, b = c1.b)
     
     else #choose N
-        return make_cheb( c1.f+c2.f , thr=max(min(c1.thr, c2.thr), 1e-12), a=c1.a, b = c1.b)
+        return make_cheb( x-> c1(x) + c2(x) , thr=max(min(c1.thr, c2.thr), 1e-12), a=c1.a, b = c1.b)
     end
 end
 
 Base.:-(c1::cheb, c2::cheb) = begin
 
-    if c1.a != c2.a || c1.b != c2.b
+    if !isapprox(c1.a , c2.a,atol=1e-7) || !isapprox(c1.b , c2.b,atol=1e-7)
         println("ERROR, cheb ranges not the same")
         return c1
     end
 
     #fixed N calculation
     if (c1.thr < 0 || c2.thr < 0 ) && c1.N == c2.N
-        return make_cheb( c1(x).f - c2.f , N=c1.N, thr=-1.0, a=c1.a, b = c1.b)
+        return make_cheb( c1.f - c2.f , thr=-1.0, a=c1.a, b = c1.b)
 
     else #choose N
-        return make_cheb( c1(x).f - c2.f , thr=max(min(c1.thr, c2.thr), 1e-12), a=c1.a, b = c1.b)
+        return make_cheb( x-> c1(x) - c2(x) , thr=max(min(c1.thr, c2.thr), 1e-12), a=c1.a, b = c1.b)
     end
 end
 
 Base.:/(c1::cheb, c2::cheb) = begin
 
-    if c1.a != c2.a || c1.b != c2.b
+    if !isapprox(c1.a , c2.a,atol=1e-7) || !isapprox(c1.b , c2.b,atol=1e-7)
         println("ERROR, cheb ranges not the same")
         return c1
     end
 
     #fixed N calculation
     if (c1.thr < 0 || c2.thr < 0 ) && c1.N == c2.N
-        return make_cheb( x-> c1(x)/c2(x) , N=c1.N, thr=-1.0, a=c1.a, b = c1.b)
+        return make_cheb(  c1.f ./ c2.f , thr=-1.0, a=c1.a, b = c1.b)
 
     else #choose N
         return make_cheb( x-> c1(x)/c2(x) , thr=max(min(c1.thr, c2.thr), 1e-12), a=c1.a, b = c1.b)
@@ -113,7 +136,7 @@ Base.:^(c1::cheb, n::Number) = begin
 
     #fixed N calculation
     if (c1.thr < 0 ) 
-        return make_cheb( x-> c1(x)^n , N=c1.N, thr=-1.0, a=c1.a, b = c1.b)
+        return make_cheb(  c1.f.^n , thr=-1.0, a=c1.a, b = c1.b)
 
     else #choose N
         return make_cheb( x-> c1(x)^n , thr=c1.thr, a=c1.a, b = c1.b)
@@ -124,7 +147,7 @@ Base.:+(c1::cheb, n::Number) = begin
 
     #fixed N calculation
     if (c1.thr < 0 ) 
-        return make_cheb( x-> c1(x)+n , N=c1.N, thr=-1.0, a=c1.a, b = c1.b)
+        return make_cheb( c1.f .+ n , thr=-1.0, a=c1.a, b = c1.b)
 
     else #choose N
         return make_cheb( x-> c1(x)+n , thr=c1.thr, a=c1.a, b = c1.b)
@@ -138,7 +161,7 @@ Base.:-(c1::cheb) = begin
 
     #fixed N calculation
     if (c1.thr < 0 ) 
-        return make_cheb( x-> -c1(x) , N=c1.N, thr=-1.0, a=c1.a, b = c1.b)
+        return make_cheb( -c1.f , thr=-1.0, a=c1.a, b = c1.b)
 
     else #choose N
         return make_cheb( x-> -c1(x) , thr=c1.thr, a=c1.a, b = c1.b)
@@ -153,15 +176,23 @@ Base.:-( n::Number, c1::cheb) = (-c1)+n
 
 Base.:*(c1::cheb, n::Number) = begin
 
-    return make_cheb(  c1.f*n , thr=c1.thr, a=c1.a, b = c1.b)
-    
+    if (c1.thr < 0 )
+        return make_cheb(  c1.f*n , thr=-1.0, a=c1.a, b = c1.b)
+    else
+        return make_cheb(  x->c1(x)*n , thr=c1.thr, a=c1.a, b = c1.b)
+    end
+        
 end
 
 Base.:*( n::Number, c1::cheb) = c1 * n
 
 Base.:/(c1::cheb, n::Number) = begin
 
-    return make_cheb(  c1.f/n , thr=c1.thr, a=c1.a, b = c1.b)
+    if (c1.thr < 0 )
+        return make_cheb(  c1.f/n , thr=c1.thr, a=c1.a, b = c1.b)
+    else
+        return make_cheb(  x->c1(x)/n , thr=c1.thr, a=c1.a, b = c1.b)
+    end
 
 end
 
