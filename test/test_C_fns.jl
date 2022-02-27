@@ -39,8 +39,8 @@ end
         return exp(-0.3*cos(3*x)) + 20
     end
 
-    c1 = ChebyshevQuantum.Chebyshev.make_Cheb(f1 , N = 20,thr=-1,   a=2, b = 3)
-    c2 = ChebyshevQuantum.Chebyshev.make_Cheb(f2 , N = 20,thr=-1,  a=2, b = 3)
+    c1 = ChebyshevQuantum.Chebyshev.make_Cheb(f1 , N = 20,thr=-1,   a=2, b = 3, edgesearch=false)
+    c2 = ChebyshevQuantum.Chebyshev.make_Cheb(f2 , N = 20,thr=-1,  a=2, b = 3, edgesearch=false)
 
     x=2.712
     @test isapprox( (c1+c2)(x), f1(x)+f2(x) , atol=tol_val)

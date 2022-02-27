@@ -205,7 +205,7 @@ function make_Cheb(ranges::Array{Float64,1}, clist; a=-1.0, b=1.0)
     
 end
 
-function make_Cheb(F::Function; N=-1, thr = 1e-12, a=-1.0, b= 1.0, Nsearch=110)
+function make_Cheb(F::Function; N=-1, thr = 1e-12, a=-1.0, b= 1.0, Nsearch=110, edgesearch=true)
 
     
     a=Float64(a)
@@ -213,7 +213,13 @@ function make_Cheb(F::Function; N=-1, thr = 1e-12, a=-1.0, b= 1.0, Nsearch=110)
 
     T=typeof( F((a+b)/2.0))
     
-    edges, contin = find(F, Nsearch, a=a, b = b)
+    if T  <: Complex || edgesearch == false
+        edges = zeros(0,2)
+        contin= Bool[]
+    else
+        edges, contin = find(F, Nsearch, a=a, b = b)
+    end
+    
     num_sec = length(contin)+2
 
     ranges = zeros(num_sec)
