@@ -3,8 +3,8 @@ module Chebyshev
 using ..Interp:cheb
 using ..EdgeDetect:find
 using ..Interp:make_cheb
-using ..Interp:integrateCC
-using ..Interp:derivative
+import ..Interp:integrateCC
+import ..Interp:derivative
 
 struct Cheb{T}
 
@@ -39,7 +39,7 @@ Base.IndexStyle(::Type{<:Cheb}) = IndexLinear()
 Base.similar(a::Cheb, ::Type{T}, d::Dims{1}) where {T} = cheb(T, d[1])
 Base.getindex(a::Cheb, i::Int) = a.clist[i]
 Base.getindex(a::Cheb, i::Tuple) = a.clist[i]
-Base.getindex(a::Cheb, i::UnitRange) = a.clist[i[1]]
+Base.getindex(a::Cheb, i::UnitRange) = a.clist[i]
 Base.setindex!(a::Cheb, v, i) = (a.clist[i] = v)
 Base.lastindex(a::Cheb) = a.num_sec-1
 Base.length(a::Cheb) = a.num_sec-1
