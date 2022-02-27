@@ -143,6 +143,12 @@ Base.:^(c1::cheb, n::Number) = begin
     end
 end
 
+Base.:inv(c1::cheb) = begin
+
+    return c1^-1.0
+    
+end
+
 Base.:+(c1::cheb, n::Number) = begin
 
     #fixed N calculation
@@ -166,6 +172,7 @@ Base.:-(c1::cheb) = begin
     else #choose N
         return make_cheb( x-> -c1(x) , thr=c1.thr, a=c1.a, b = c1.b)
     end
+    
 end
 
 Base.:-(c1::cheb, n::Number) = begin
@@ -251,7 +258,8 @@ function make_cheb(fpts::Array; a=-1.0, b= 1.0, thr = 1e-12)
 
     N = length(fpts) - 1
     p = get_interp(fpts)
-    cheb(N, a, b, thr, fpts, p)
+
+    return cheb(N, a, b, thr, fpts, p)
     
 end
     
@@ -482,23 +490,25 @@ function get_interp(fpts::Array; pts=missing)
         pts = getCpts(N)
     end
     
-    g = zeros(N+1)
-
-    function gg(x)
-
-        g[:] .= (-1).^(0:N) ./ (x .- pts)
-
-        #        for k = 0:N
-        #            g[k+1] = (-1)^k./(x - pts[k+1])
-        #        end
-        
-        g[1] = g[1] * 0.5
-        g[N+1] = g[N+1] * 0.5
-        return g
-    end
     
     function p(x)
 
+        T = typeof(x)
+        g = zeros(T, N+1)
+
+        function gg(x)
+            g[:] .= (-1).^(0:N) ./ (x .- pts)
+
+            #                for k = 0:N
+            #                    g[k+1] = (-1)^k /(x - pts[k+1])
+            #               end
+            
+            g[1] = g[1] * 0.5
+            g[N+1] = g[N+1] * 0.5
+            return g
+        end
+
+        
         i = argmin(abs.(x .- pts))
         if abs(x - pts[i]) < 1e-10 #if exact match return function value, avoid divde by zero
             return fpts[i]
