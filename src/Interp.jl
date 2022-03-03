@@ -335,9 +335,19 @@ end
 function getCpts(N::Integer)
 
     if N <= 0
-        return 0.0
+        return [0.0]
     else
         return -cos.( (0:N)*pi / N)
+    end
+        
+end
+
+function getCpts1(N::Integer)
+
+    if N <= 0
+        return [0.0]
+    else
+        return -cos.( (2*(1:(N+1)) .- 1)*pi/2/(N+1))
     end
         
 end
@@ -397,6 +407,45 @@ function getW(N)
     end
     return w, pts
 end
+
+
+function baryW1(N)
+    w = zeros(N+1)
+    for i = 1:N+1
+        w[i] = (-1.0)^(i)
+    end
+    w[1] *= 0.5
+    w[N+1] *= 0.5
+    return w
+end
+
+function barymat(y,x,w)
+
+    P = zeros(length(y), length(x))
+    for i = 1:length(y)
+        for j = 1:length(x)
+            if abs(y[i] - x[j]) < 1e-9
+                P[i,j] = 1.0
+            else
+               # println("$i $j w $(w[j]) y $(y[i]) x  $(x[j])  " , w[j] / (y[i] - x[j]))
+                P[i,j] = w[j] / (y[i] - x[j])
+            end
+        end
+    end
+
+    s = sum(P, dims=2)
+
+    for i = 1:length(y)
+        for j = 1:length(x)
+            if abs(y[i] - x[j]) > 1e-9
+                P[i,j] = P[i,j] / s[i]
+            end
+        end
+    end
+    return P
+    
+end
+
 
 function integrateCC(f::Function, N::Integer; w = missing, pts = missing, a = -1.0, b = 1.0 )
 
