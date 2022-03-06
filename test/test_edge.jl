@@ -4,6 +4,8 @@ using Test
 tol_val = 1e-11
 
 
+deriv=:forwarddiff
+
 @testset "find edge function " begin
 
     #step function
@@ -15,7 +17,7 @@ tol_val = 1e-11
         end
     end
 
-    c, stddev = ChebyshevQuantum.EdgeDetect.find_edges(f, deriv=:asdf)
+    c, stddev = ChebyshevQuantum.EdgeDetect.find_edges(f, deriv=deriv)
     
     @test isapprox(c[1,1], 0.2,  atol=1e-4)
     @test isapprox(c[1,2], 0.2,  atol=1e-4)
@@ -36,7 +38,7 @@ end
     end
     #f(0.1)
     #f.([0.1,0.2])
-    c, contin = ChebyshevQuantum.EdgeDetect.find(f, deriv=:asdf)
+    c, contin = ChebyshevQuantum.EdgeDetect.find(f, deriv=deriv)
     
     @test isapprox(c[1,1], 0.1,  atol=1e-4)
     @test isapprox(c[1,2], 0.1,  atol=1e-4)

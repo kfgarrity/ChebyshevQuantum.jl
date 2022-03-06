@@ -112,7 +112,7 @@ function find_edges(f, N = 110; a=-1.0, b = 1.0, deriv=:forwarddiff)
 
         if new_max_err >= old_max_err *0.1 || new_max_err > 1e2 #true discont doesn't shrink (much) as we get closer
 
-            for j = 1:6
+            for j = 1:7
                 gridX, grid2X, fgX, dfgX, df_approxX, df_errX = get_derivs(f,df, 20, a=gridX[ind], b=gridX[ind+1])
                 ind =argmax(abs.(df_errX))
                 new_max_err = abs.(df_errX[ind])

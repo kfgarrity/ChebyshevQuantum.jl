@@ -256,6 +256,9 @@ end
     
 function make_cheb(fpts::Array; a=-1.0, b= 1.0, thr = 1e-12)
 
+    a = Float64(a)
+    b = Float64(b)
+    
     N = length(fpts) - 1
     p = get_interp(fpts)
 
