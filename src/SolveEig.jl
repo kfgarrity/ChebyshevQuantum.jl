@@ -9,7 +9,9 @@ using ..Interp:barymat
 using ..Interp:forward
 using ..Interp:rev
 using ..EdgeDetect:find
+using ..Op:setup
 
+#=
 function many_ham(V, N; d2 = -0.5, d1 = 0.0, a = -1.0, b = 1.0, Nsearch=103)
 
     edges, contin = find(V, Nsearch, a=a, b=b)
@@ -240,7 +242,8 @@ function total_ham_piecewise(V, N, ranges; d2 = -0.5, d1 = 0.0)
     
 
 end
-    
+=#
+
 function setup_ham(V, N; d2 = -0.5, d1 = 0.0, a = -1.0, b = 1.0)
 
     D = getD(N);
@@ -258,7 +261,7 @@ function setup_ham(V, N; d2 = -0.5, d1 = 0.0, a = -1.0, b = 1.0)
 
 end
 
-
+#=
 function setup_ham2(V, N; d2 = -0.5, d1 = 0.0, a = -1.0, b = 1.0)
 
     D = getD(N);
@@ -275,6 +278,8 @@ function setup_ham2(V, N; d2 = -0.5, d1 = 0.0, a = -1.0, b = 1.0)
     return Vpts, Dab
 
 end
+
+=#
 
 function finite_diff_ham(V, N; d2 = -0.5, d1 = 0.0, a = -1.0, b = 1.0)
 
@@ -299,14 +304,25 @@ function finite_diff_ham(V, N; d2 = -0.5, d1 = 0.0, a = -1.0, b = 1.0)
 
 end
 
-function solve(H)
+function solve(;N = 30, bc1 =  [:a,0,0.0], bc2 = [:b,0,0.0], ranges=zeros(0,2), contin = Bool[], A0=0.0, A1=0.0, A2=-0.5, B=0.0, a = -1.0, b = 1.0, V = missing, dosplit=true)
 
-    vals, vects = eigen( H[2:end-1,2:end-1]);
+    if !ismissing(V)
+        A0 = V
+    end
+       
+
+    H, S, rhs =  setup(N=N, a=a,b=b,bc1=bc1, bc2=bc2, ranges=ranges, contin=contin, A0=A0, A1=A1,A2=A2,B=B,dosplit=dosplit)
+
+    vals, vects = eigen( H, S)
+
+    return real.(vals), vects
+    
+    #vals, vects = eigen( H[2:end-1,2:end-1]);
     #vals, vects = eigen( H);
 
 #    vects_n = normalize_vects(vects)
 
-    return vals, vects
+    #return vals, vects
 
 end
 

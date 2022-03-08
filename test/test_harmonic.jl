@@ -13,8 +13,9 @@ tol_val = 1e-8
         return 0.5 * ω^2 * x^2
     end
     
-    H = ChebyshevQuantum.SolveEig.setup_ham(V, 60, a=-1.0, b= 1.0);
-    vals, vects =  ChebyshevQuantum.SolveEig.solve(H);
+    vals, vects = ChebyshevQuantum.SolveEig.solve(V=V, N=60, dosplit=false)
+    #H = ChebyshevQuantum.SolveEig.setup_ham(V, 60, a=-1.0, b= 1.0);
+    #vals, vects =  ChebyshevQuantum.SolveEig.solve(H);
 
     @test isapprox(vals[1],   (0.5+0) * ω)
     @test isapprox(vals[2],   (0.5+1) * ω)
@@ -33,8 +34,11 @@ end
         return 0.5 * ω^2 * x^2
     end
     
-    H = ChebyshevQuantum.SolveEig.setup_ham(V, 60, a=-10.0, b= 10.0);
-    vals, vects =  ChebyshevQuantum.SolveEig.solve(H);
+
+    vals, vects = ChebyshevQuantum.SolveEig.solve(V=V, N=60, a=-10.0, b= 10.0, dosplit=false)
+
+    #    H = ChebyshevQuantum.SolveEig.setup_ham(V, 60, a=-10.0, b= 10.0);
+    #    vals, vects =  ChebyshevQuantum.SolveEig.solve(H);
 
     @test isapprox(vals[1],   (0.5+0) * ω)
     @test isapprox(vals[2],   (0.5+1) * ω)
