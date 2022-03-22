@@ -304,7 +304,7 @@ function finite_diff_ham(V, N; d2 = -0.5, d1 = 0.0, a = -1.0, b = 1.0)
 
 end
 
-function solve(;N = 30, bc1 =  [:a,0,0.0], bc2 = [:b,0,0.0], ranges=zeros(0,2), contin = Bool[], A0=0.0, A1=0.0, A2=-0.5, B=0.0, a = -1.0, b = 1.0, V = missing, dosplit=true)
+function solve(;N = 30, bc1 =  [:a,0,0.0], bc2 = [:b,0,0.0], ranges=zeros(0,2), contin = Bool[], A0=0.0, A1=0.0, A2=-0.5, B=1.0, a = -1.0, b = 1.0, V = missing, dosplit=true)
 
     if !ismissing(V)
         A0 = V
@@ -315,7 +315,7 @@ function solve(;N = 30, bc1 =  [:a,0,0.0], bc2 = [:b,0,0.0], ranges=zeros(0,2), 
 
     vals, vects = eigen( H, S)
 
-    return real.(vals), vects
+    return vals, vects
     
     #vals, vects = eigen( H[2:end-1,2:end-1]);
     #vals, vects = eigen( H);

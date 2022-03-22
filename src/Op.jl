@@ -9,7 +9,7 @@ using ..Interp:forward
 using ..Interp:rev
 using ..EdgeDetect:find
 
-function setup(; N = 20, bc1 = [:a,0,0.0], bc2 = [:b,0,0.0], ranges=zeros(0,2), contin = Bool[], A0=0.0, A1=0.0, A2=0.0, B=0.0, a = -1.0, b = 1.0, dosplit=true)
+function setup(; N = 20, bc1 = [:a,0,0.0], bc2 = [:b,0,0.0], ranges=zeros(0,2), contin = Bool[], A0=0.0, A1=0.0, A2=0.0, B=1.0, a = -1.0, b = 1.0, dosplit=true)
 
     a = Float64(a)
     b = Float64(b)
@@ -138,14 +138,16 @@ function setup_fn(; N = 20, bc1 = [:a,0,0.0], bc2 = [:b,0,0.0], ranges=zeros(0,2
     b1 = a
     for c in 1:size(ranges)[1]
         b1 = ranges[c,1]
-        pts, D = getmats(N[c]; a = a1+1e-15, b = b1-1e-15)
+        pts, D = getmats(N[c]; a = a1+1e-20, b = b1-1e-20)
         push!(DL, D)
         push!(VL, pts)
         a1 = ranges[c,2]
         
     end
+
     b1 = b
-    Vpts, Dab = getmats( N[end]; a = a1+1e-15, b = b1-1e-15)
+    Vpts, Dab = getmats( N[end]; a = a1+1e-20, b = b1-1e-20)
+    println("Vpts ", Vpts[1:4])
     push!(DL, Dab)
     push!(VL, Vpts)
     
@@ -184,11 +186,10 @@ function setup_fn(; N = 20, bc1 = [:a,0,0.0], bc2 = [:b,0,0.0], ranges=zeros(0,2
         end
     end
 
-#    println("bc1 $bc1 bc2 $bc2")
+    println("bc1 $bc1 bc2 $bc2")
     
     Bound = zeros(0,hsize)
     BC1, v1 = apply_bc(bc1)
-    BC2, v2 = apply_bc(bc2)
 
 #    println("hsize $hsize")
 #    println("size BC1 ", size(BC1))
@@ -196,7 +197,8 @@ function setup_fn(; N = 20, bc1 = [:a,0,0.0], bc2 = [:b,0,0.0], ranges=zeros(0,2
     
     Bound = [Bound; BC1]
 
-    if !ismissing(bc1)
+    if !ismissing(bc2)
+        BC2, v2 = apply_bc(bc2)
         Bound = [Bound; BC2]
     end
 
@@ -235,6 +237,8 @@ function setup_fn(; N = 20, bc1 = [:a,0,0.0], bc2 = [:b,0,0.0], ranges=zeros(0,2
 
         #D2 = A2(1.0)*(d*d)
         #D1 = A1(1.0)*(d)
+
+        println("A0 ", A0.(pts[1:3]))
         
         v = diagm(A0.(pts))
         #v = A0.(ptsmat)
@@ -252,7 +256,8 @@ function setup_fn(; N = 20, bc1 = [:a,0,0.0], bc2 = [:b,0,0.0], ranges=zeros(0,2
         n2r += size(v)[1] - 2
         n2c += size(v)[1] 
         H[(n1r+1):n2r,(n1c+1):n2c] += P*H0
-        S[(n1r+1):n2r,(n1c+1):n2c] += P*I(N+1)
+        #        S[(n1r+1):n2r,(n1c+1):n2c] += P*I(N+1)
+        S[(n1r+1):n2r,(n1c+1):n2c] += P*diagm(B.(pts))
 
         rhs[(n1r+1):n2r] = P*B.(pts)
         
