@@ -65,6 +65,17 @@ Base.imag(c1::cheb) = begin
     end
 end
 
+Base.conj(c1::cheb) = begin
+
+    #fixed N calculation
+    if (c1.thr < 0 ) 
+        return make_cheb(  conj.(c1.f) , thr=-1.0, a=c1.a, b = c1.b)
+
+    else #choose N
+        return make_cheb( x-> conj(c1(x)) , thr=c1.thr, a=c1.a, b = c1.b)
+    end
+end
+
 
 Base.:*(c1::cheb, c2::cheb) = begin
 
