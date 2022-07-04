@@ -26,6 +26,8 @@ Base.IndexStyle(::Type{<:cheb}) = IndexLinear()
 Base.similar(a::cheb, ::Type{T}, d::Dims{1}) where {T} = cheb(T, d[1])
 Base.getindex(a::cheb, i::Int) = a.f[i]
 Base.getindex(a::cheb, i::Tuple) = a.f[i[1]]
+Base.getindex(a::cheb, i::Array) = a.f[i]
+Base.getindex(a::cheb, i::UnitRange) = a.f[i]
 Base.setindex!(a::cheb, v, i) = (a.f[i] = v)
 Base.lastindex(a::cheb) = (a.N+1,)
 Base.length(a::cheb) = a.N+1
