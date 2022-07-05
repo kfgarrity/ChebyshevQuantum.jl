@@ -1,7 +1,7 @@
 using LinearAlgebra
 using Optim
 
-function goinv(;ω = 1.0, N = 60, a = -3.0, b = 3.0)
+function goinv2(;ω = 1.0, N = 60, a = -3.0, b = 3.0)
 
     D = ChebyshevQuantum.Interp.getD(N);
     Dab = D/ ((b-a)/2.0)
@@ -13,7 +13,7 @@ function goinv(;ω = 1.0, N = 60, a = -3.0, b = 3.0)
     
     
     function V(x)
-        return 0.5 * ω^2 * x^2
+        return 0.5 * ω^2 * x^2  + 0.1 * x^3
     end
 
     V_m = ChebyshevQuantum.Interp.make_cheb(V; N = N, a = a, b = b)[2:N]
@@ -24,7 +24,7 @@ function goinv(;ω = 1.0, N = 60, a = -3.0, b = 3.0)
 
     println("target vals " , vals[1:4])
     
-    rho_target =  ( real.(vects[:,1] .* conj(vects[:,1])) )
+    rho_target = sum( ( real.(vects[:,1:2] .* conj(vects[:,1:2])) ), dims=2)
 
     #weights
     #w = ( 10^6 .+ 10^8 * xvals.^4)[2:N]
@@ -49,7 +49,7 @@ function goinv(;ω = 1.0, N = 60, a = -3.0, b = 3.0)
     
         H[:,:] = KE + diagm(x)
         vals, vects = eigen(H)
-        rho = real.(vects[:,1] .* conj(vects[:,1]))
+        rho = sum(real.(vects[:,1:2] .* conj(vects[:,1:2])), dims=2)
         println("rho diff ", sum(abs.(rho - rho_target)))
 #        println("calc vals " , vals[1:4])
 
@@ -66,21 +66,24 @@ function goinv(;ω = 1.0, N = 60, a = -3.0, b = 3.0)
 
         H[:,:] = KE + diagm(x)
         vals, vects = eigen(H)
-        rho[:] = real.(vects[:,1] .* conj(vects[:,1]))
+
+        rho[:] = sum(real.(vects[:,1:2] .* conj(vects[:,1:2])), dims=2)
+
+        grad .= 0.0
+        for ii = 1:2
+
+            MAT[1:(N-1), 1:(N-1) ] = H' - I(N-1)*vals[ii]
+            MAT[1:(N-1), N] = 2.0*vects[:,ii]
+            MAT[N,1:(N-1)] = vects[:,ii]'
         
-        
 
-        MAT[1:(N-1), 1:(N-1) ] = H' - I(N-1)*vals[1]
-        MAT[1:(N-1), N] = 2.0*vects[:,1]
-        MAT[N,1:(N-1)] = vects[:,1]'
-        
+            #        println( size(rho_target), " " , size(rho), "  ", size(vects[:,1]))
+            B[1:(N-1)] = w .* 4.0 .*(rho_target - rho) .* vects[:,ii]
 
-#        println( size(rho_target), " " , size(rho), "  ", size(vects[:,1]))
-        B[1:(N-1)] = w .* 4.0 .*(rho_target - rho) .* vects[:,1]
+            v =  MAT \ B
 
-        v =  MAT \ B
-
-        grad[:] = real.(v[1:N-1] .* vects[:,1])
+            grad[:] += real.(v[1:N-1] .* vects[:,ii])
+        end
 #        println("grad ", sum(abs.(grad)))
         
         return grad
