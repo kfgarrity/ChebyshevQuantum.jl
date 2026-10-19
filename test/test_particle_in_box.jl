@@ -1,5 +1,6 @@
 using ChebyshevQuantum
 using Test
+using LinearAlgebra
 
 tol_val = 1e-10
 

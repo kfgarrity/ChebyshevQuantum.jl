@@ -238,7 +238,7 @@ function rev(x,a,b)
 end
 
 function make_cheb(F::Function; N = -1, thr = 1e-12, a = -1.0, b = 1.0)
-
+    println("make_cheb")
     a=Float64(a)
     b=Float64(b)
     thr=Float64(thr)
@@ -250,6 +250,7 @@ function make_cheb(F::Function; N = -1, thr = 1e-12, a = -1.0, b = 1.0)
     end
 
     if N > 0
+        println("N $N")
         pts = getCpts(N)
         fpts = F.(rev(pts,a,b))
         p = get_interp(fpts, pts=pts)
